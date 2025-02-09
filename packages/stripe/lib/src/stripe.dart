@@ -141,6 +141,18 @@ class Stripe {
     return isSupported;
   }
 
+  Future<AvailableMobilePayOptions> availableMobilePayOptions({
+    IsGooglePaySupportedParams? googlePay,
+    PlatformPayWebPaymentRequestCreateOptions? webPaymentRequestCreateOptions,
+  }) async {
+    await _awaitForSettings();
+
+    return await _platform.availableMobilePayOptions(
+      params: googlePay,
+      paymentRequestOptions: webPaymentRequestCreateOptions,
+    );
+  }
+
   /// Launches the relevant native wallsheet (Apple Pay on iOS and Google Pay on Android)
   /// in order to create a payment intent
   ///
@@ -283,6 +295,16 @@ class Stripe {
       throw StripeError(message: error.message, code: error.message);
     }
   }
+
+  Future<PaymentMethod> createPaymentMethodWithElements() =>
+      _platform.createPaymentMethodWithElements();
+
+  Future<void> elementsSubmit() => _platform.elementsSubmit();
+
+  Future<PaymentIntent> handleCardAction(
+    final String paymentIntentClientSecret,
+  ) =>
+      _platform.handleCardAction(paymentIntentClientSecret);
 
   /// Creates a single-use token that represents a credit card’s details.
   ///
@@ -540,7 +562,7 @@ class Stripe {
 
   /// Collect the bankaccount details for the payment intent.
   ///
-  /// Only US bank accounts are supported. 
+  /// Only US bank accounts are supported.
   Future<PaymentIntent> collectBankAccount({
     /// Whether the clientsecret is associated with setup or paymentintent
     required bool isPaymentIntent,

@@ -283,6 +283,16 @@ class WebStripe extends StripePlatform {
   Future<PaymentIntent> handleNextAction(String paymentIntentClientSecret,
       {String? returnURL}) async {
     final stripe_js.PaymentIntentResponse response =
+        await _stripe.handleNextAction(paymentIntentClientSecret);
+
+    return response.paymentIntent!.parse();
+  }
+
+  @override
+  Future<PaymentIntent> handleCardAction(
+    String paymentIntentClientSecret,
+  ) async {
+    final stripe_js.PaymentIntentResponse response =
         await _stripe.handleCardAction(paymentIntentClientSecret);
     return response.paymentIntent!.parse();
   }
@@ -361,8 +371,11 @@ class WebStripe extends StripePlatform {
   }
 
   @override
-  Future<PaymentIntent> retrievePaymentIntent(String clientSecret) async {
-    throw UnimplementedError();
+  Future<PaymentIntent> retrievePaymentIntent(final String clientSecret) async {
+    final stripe_js.PaymentIntentResponse response =
+        await _stripe.retrievePaymentIntent(clientSecret);
+
+    return response.paymentIntent!.parse();
   }
 
   @override
@@ -405,11 +418,13 @@ class WebStripe extends StripePlatform {
   }
 
   Future<PaymentIntent> confirmPaymentElement(
-    ConfirmPaymentElementOptions options,
-  ) async {
+    ConfirmPaymentElementOptions options, [
+    String? clientSecret,
+  ]) async {
     final response = await js.confirmPayment(
       stripe_js.ConfirmPaymentOptions(
         elements: elements!,
+        clientSecret: clientSecret,
         confirmParams: options.confirmParams,
         redirect: options.redirect,
       ),
@@ -435,6 +450,26 @@ class WebStripe extends StripePlatform {
       throw response.error!;
     } else {
       return;
+    }
+  }
+
+  Future<void> elementsSubmit() => elements!.submit();
+
+  @override
+  Future<PaymentMethod> createPaymentMethodWithElements() async {
+    try {
+      final response = await js.createPaymentMethodWithElements(
+        stripe_js.CreatePaymentMethodWithElementsData(elements: elements!),
+      );
+
+      if (response.error != null) {
+        throw response.error!;
+      }
+
+      return response.paymentMethod!.parse();
+    } catch (e) {
+      dev.log('Error $e');
+      rethrow;
     }
   }
 
@@ -531,6 +566,24 @@ class WebStripe extends StripePlatform {
   @override
   Future<void> resetPaymentSheetCustomer() {
     throw WebUnsupportedError.method('resetPaymentSheet');
+  }
+
+  @override
+  Future<AvailableMobilePayOptions> availableMobilePayOptions({
+    IsGooglePaySupportedParams? params,
+    PlatformPayWebPaymentRequestCreateOptions? paymentRequestOptions,
+  }) async {
+    final paymentRequest = js.paymentRequest((paymentRequestOptions ??
+            PlatformPayWebPaymentRequestCreateOptions.defaultOptions)
+        .toJS());
+
+    final paymentOptions = await paymentRequest.canMakePayment();
+
+    return AvailableMobilePayOptions(
+      googlePay: paymentOptions?.googlePay ?? false,
+      applePay: paymentOptions?.applePay ?? false,
+      link: paymentOptions?.link ?? false,
+    );
   }
 
   @override

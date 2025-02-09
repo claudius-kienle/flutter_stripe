@@ -1,3 +1,7 @@
+## 6.3.1
+**Features**
+- add method for deferred payment
+
 ## 6.3.0
 **Features**
 - Add P24 support on Stripe web
