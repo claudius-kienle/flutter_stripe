@@ -87,6 +87,9 @@ enum PaymentMethodType {
   /// PayNow is a QR code payment method used in Singapore.
   paynow,
 
+  /// PayPal is a payment method that enables customers in any country to pay using their PayPal account.
+  paypal,
+
   /// Pix is an instant bank transfer payment method in Brazil.
   pix,
 

@@ -84,24 +84,17 @@ class WebStripe extends StripePlatform {
     PaymentMethodParams data, [
     PaymentMethodOptions? options,
   ]) async {
-    return data.maybeWhen(
-      card: (data) {
-        return _createCardPaymentMethod(data);
-      },
-      orElse: () {
-        throw UnimplementedError();
-      },
-    );
-  }
-
-  Future<PaymentMethod> _createCardPaymentMethod(PaymentMethodData data) async {
-    final params = stripe_js.CreatePaymentMethodData(
-      type: 'card',
-      card: element!,
-      billingDetails: data.billingDetails?.toJs(),
+    final paymentMethodData = data.maybeWhen(
+      card: (data) => stripe_js.CreatePaymentMethodData(
+          type: 'card',
+          card: element!,
+          billingDetails: data.billingDetails?.toJs()),
+      payPal: (data) => stripe_js.CreatePaymentMethodData(
+          type: 'paypal', billingDetails: data.billingDetails?.toJs()),
+      orElse: () => throw WebUnsupportedError(),
     );
     try {
-      final response = await js.createPaymentMethod(params);
+      final response = await js.createPaymentMethod(paymentMethodData);
       if (response.error != null) {
         throw response.error!;
       }
@@ -282,9 +275,29 @@ class WebStripe extends StripePlatform {
   @override
   Future<PaymentIntent> handleNextAction(String paymentIntentClientSecret,
       {String? returnURL}) async {
-    final stripe_js.PaymentIntentResponse response =
-        await _stripe.handleCardAction(paymentIntentClientSecret);
-    return response.paymentIntent!.parse();
+    final paymentIntentResponse =
+        await _stripe.retrievePaymentIntent(paymentIntentClientSecret);
+    if (paymentIntentResponse.error != null) {
+      throw paymentIntentResponse.error!;
+    }
+    final paymentIntent = paymentIntentResponse.paymentIntent!;
+    final Map? nextAction = paymentIntent.nextAction;
+    if (nextAction != null) {
+      switch (nextAction['type']) {
+        case 'redirect_to_url':
+          final response =
+              await _stripe.handleNextAction(paymentIntentClientSecret);
+          if (response.error != null) {
+            throw response.error!;
+          }
+          return response.paymentIntent!.parse();
+        default:
+          throw WebUnsupportedError();
+      }
+    }
+    // final stripe_js.PaymentIntentResponse response =
+    // await _stripe.handleCardAction(paymentIntentClientSecret);
+    return paymentIntent.parse();
   }
 
   @override

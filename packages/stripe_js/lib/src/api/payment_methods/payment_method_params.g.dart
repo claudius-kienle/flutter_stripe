@@ -315,19 +315,13 @@ _$PaymentMethodDataImpl _$$PaymentMethodDataImplFromJson(Map json) =>
     );
 
 Map<String, dynamic> _$$PaymentMethodDataImplToJson(
-    _$PaymentMethodDataImpl instance) {
-  final val = <String, dynamic>{};
-
-  void writeNotNull(String key, dynamic value) {
-    if (value != null) {
-      val[key] = value;
-    }
-  }
-
-  writeNotNull('billingDetails', instance.billingDetails?.toJson());
-  writeNotNull('shippingDetails', instance.shippingDetails?.toJson());
-  return val;
-}
+        _$PaymentMethodDataImpl instance) =>
+    <String, dynamic>{
+      if (instance.billingDetails?.toJson() case final value?)
+        'billingDetails': value,
+      if (instance.shippingDetails?.toJson() case final value?)
+        'shippingDetails': value,
+    };
 
 _$PaymentMethodDataCardFromTokenImpl
     _$$PaymentMethodDataCardFromTokenImplFromJson(Map json) =>
@@ -344,21 +338,14 @@ _$PaymentMethodDataCardFromTokenImpl
         );
 
 Map<String, dynamic> _$$PaymentMethodDataCardFromTokenImplToJson(
-    _$PaymentMethodDataCardFromTokenImpl instance) {
-  final val = <String, dynamic>{
-    'token': instance.token,
-  };
-
-  void writeNotNull(String key, dynamic value) {
-    if (value != null) {
-      val[key] = value;
-    }
-  }
-
-  writeNotNull('billingDetails', instance.billingDetails?.toJson());
-  writeNotNull('shippingDetails', instance.shippingDetails?.toJson());
-  return val;
-}
+        _$PaymentMethodDataCardFromTokenImpl instance) =>
+    <String, dynamic>{
+      'token': instance.token,
+      if (instance.billingDetails?.toJson() case final value?)
+        'billingDetails': value,
+      if (instance.shippingDetails?.toJson() case final value?)
+        'shippingDetails': value,
+    };
 
 _$PaymentMethodDataCardFromMethodImpl
     _$$PaymentMethodDataCardFromMethodImplFromJson(Map json) =>
@@ -376,22 +363,15 @@ _$PaymentMethodDataCardFromMethodImpl
         );
 
 Map<String, dynamic> _$$PaymentMethodDataCardFromMethodImplToJson(
-    _$PaymentMethodDataCardFromMethodImpl instance) {
-  final val = <String, dynamic>{
-    'paymentMethodId': instance.paymentMethodId,
-  };
-
-  void writeNotNull(String key, dynamic value) {
-    if (value != null) {
-      val[key] = value;
-    }
-  }
-
-  writeNotNull('cvc', instance.cvc);
-  writeNotNull('billingDetails', instance.billingDetails?.toJson());
-  writeNotNull('shippingDetails', instance.shippingDetails?.toJson());
-  return val;
-}
+        _$PaymentMethodDataCardFromMethodImpl instance) =>
+    <String, dynamic>{
+      'paymentMethodId': instance.paymentMethodId,
+      if (instance.cvc case final value?) 'cvc': value,
+      if (instance.billingDetails?.toJson() case final value?)
+        'billingDetails': value,
+      if (instance.shippingDetails?.toJson() case final value?)
+        'shippingDetails': value,
+    };
 
 _$PaymentMethodDataIdealImpl _$$PaymentMethodDataIdealImplFromJson(Map json) =>
     _$PaymentMethodDataIdealImpl(
@@ -407,20 +387,14 @@ _$PaymentMethodDataIdealImpl _$$PaymentMethodDataIdealImplFromJson(Map json) =>
     );
 
 Map<String, dynamic> _$$PaymentMethodDataIdealImplToJson(
-    _$PaymentMethodDataIdealImpl instance) {
-  final val = <String, dynamic>{};
-
-  void writeNotNull(String key, dynamic value) {
-    if (value != null) {
-      val[key] = value;
-    }
-  }
-
-  writeNotNull('bankName', instance.bankName);
-  writeNotNull('billingDetails', instance.billingDetails?.toJson());
-  writeNotNull('shippingDetails', instance.shippingDetails?.toJson());
-  return val;
-}
+        _$PaymentMethodDataIdealImpl instance) =>
+    <String, dynamic>{
+      if (instance.bankName case final value?) 'bankName': value,
+      if (instance.billingDetails?.toJson() case final value?)
+        'billingDetails': value,
+      if (instance.shippingDetails?.toJson() case final value?)
+        'shippingDetails': value,
+    };
 
 _$PaymentMethodDataAubecsImpl _$$PaymentMethodDataAubecsImplFromJson(
         Map json) =>
@@ -437,20 +411,14 @@ _$PaymentMethodDataAubecsImpl _$$PaymentMethodDataAubecsImplFromJson(
     );
 
 Map<String, dynamic> _$$PaymentMethodDataAubecsImplToJson(
-    _$PaymentMethodDataAubecsImpl instance) {
-  final val = <String, dynamic>{};
-
-  void writeNotNull(String key, dynamic value) {
-    if (value != null) {
-      val[key] = value;
-    }
-  }
-
-  writeNotNull('formDetails', instance.formDetails);
-  writeNotNull('billingDetails', instance.billingDetails?.toJson());
-  writeNotNull('shippingDetails', instance.shippingDetails?.toJson());
-  return val;
-}
+        _$PaymentMethodDataAubecsImpl instance) =>
+    <String, dynamic>{
+      if (instance.formDetails case final value?) 'formDetails': value,
+      if (instance.billingDetails?.toJson() case final value?)
+        'billingDetails': value,
+      if (instance.shippingDetails?.toJson() case final value?)
+        'shippingDetails': value,
+    };
 
 _$PaymentMethodDataFpxImpl _$$PaymentMethodDataFpxImplFromJson(Map json) =>
     _$PaymentMethodDataFpxImpl(
@@ -466,21 +434,14 @@ _$PaymentMethodDataFpxImpl _$$PaymentMethodDataFpxImplFromJson(Map json) =>
     );
 
 Map<String, dynamic> _$$PaymentMethodDataFpxImplToJson(
-    _$PaymentMethodDataFpxImpl instance) {
-  final val = <String, dynamic>{
-    'testOfflineBank': instance.testOfflineBank,
-  };
-
-  void writeNotNull(String key, dynamic value) {
-    if (value != null) {
-      val[key] = value;
-    }
-  }
-
-  writeNotNull('billingDetails', instance.billingDetails?.toJson());
-  writeNotNull('shippingDetails', instance.shippingDetails?.toJson());
-  return val;
-}
+        _$PaymentMethodDataFpxImpl instance) =>
+    <String, dynamic>{
+      'testOfflineBank': instance.testOfflineBank,
+      if (instance.billingDetails?.toJson() case final value?)
+        'billingDetails': value,
+      if (instance.shippingDetails?.toJson() case final value?)
+        'shippingDetails': value,
+    };
 
 _$PaymentMethodDataSofortImpl _$$PaymentMethodDataSofortImplFromJson(
         Map json) =>
@@ -497,21 +458,14 @@ _$PaymentMethodDataSofortImpl _$$PaymentMethodDataSofortImplFromJson(
     );
 
 Map<String, dynamic> _$$PaymentMethodDataSofortImplToJson(
-    _$PaymentMethodDataSofortImpl instance) {
-  final val = <String, dynamic>{
-    'country': instance.country,
-  };
-
-  void writeNotNull(String key, dynamic value) {
-    if (value != null) {
-      val[key] = value;
-    }
-  }
-
-  writeNotNull('billingDetails', instance.billingDetails?.toJson());
-  writeNotNull('shippingDetails', instance.shippingDetails?.toJson());
-  return val;
-}
+        _$PaymentMethodDataSofortImpl instance) =>
+    <String, dynamic>{
+      'country': instance.country,
+      if (instance.billingDetails?.toJson() case final value?)
+        'billingDetails': value,
+      if (instance.shippingDetails?.toJson() case final value?)
+        'shippingDetails': value,
+    };
 
 _$PaymentMethodDataSepaImpl _$$PaymentMethodDataSepaImplFromJson(Map json) =>
     _$PaymentMethodDataSepaImpl(
@@ -527,21 +481,14 @@ _$PaymentMethodDataSepaImpl _$$PaymentMethodDataSepaImplFromJson(Map json) =>
     );
 
 Map<String, dynamic> _$$PaymentMethodDataSepaImplToJson(
-    _$PaymentMethodDataSepaImpl instance) {
-  final val = <String, dynamic>{
-    'iban': instance.iban,
-  };
-
-  void writeNotNull(String key, dynamic value) {
-    if (value != null) {
-      val[key] = value;
-    }
-  }
-
-  writeNotNull('billingDetails', instance.billingDetails?.toJson());
-  writeNotNull('shippingDetails', instance.shippingDetails?.toJson());
-  return val;
-}
+        _$PaymentMethodDataSepaImpl instance) =>
+    <String, dynamic>{
+      'iban': instance.iban,
+      if (instance.billingDetails?.toJson() case final value?)
+        'billingDetails': value,
+      if (instance.shippingDetails?.toJson() case final value?)
+        'shippingDetails': value,
+    };
 
 _$PaymentMethodDataAfterPayImpl _$$PaymentMethodDataAfterPayImplFromJson(
         Map json) =>
@@ -555,20 +502,12 @@ _$PaymentMethodDataAfterPayImpl _$$PaymentMethodDataAfterPayImplFromJson(
     );
 
 Map<String, dynamic> _$$PaymentMethodDataAfterPayImplToJson(
-    _$PaymentMethodDataAfterPayImpl instance) {
-  final val = <String, dynamic>{
-    'billingDetails': instance.billingDetails.toJson(),
-  };
-
-  void writeNotNull(String key, dynamic value) {
-    if (value != null) {
-      val[key] = value;
-    }
-  }
-
-  writeNotNull('shippingDetails', instance.shippingDetails?.toJson());
-  return val;
-}
+        _$PaymentMethodDataAfterPayImpl instance) =>
+    <String, dynamic>{
+      'billingDetails': instance.billingDetails.toJson(),
+      if (instance.shippingDetails?.toJson() case final value?)
+        'shippingDetails': value,
+    };
 
 _$PaymentMethodDataUsBankImpl _$$PaymentMethodDataUsBankImplFromJson(
         Map json) =>
@@ -590,24 +529,20 @@ _$PaymentMethodDataUsBankImpl _$$PaymentMethodDataUsBankImplFromJson(
     );
 
 Map<String, dynamic> _$$PaymentMethodDataUsBankImplToJson(
-    _$PaymentMethodDataUsBankImpl instance) {
-  final val = <String, dynamic>{};
-
-  void writeNotNull(String key, dynamic value) {
-    if (value != null) {
-      val[key] = value;
-    }
-  }
-
-  writeNotNull('accountNumber', instance.accountNumber);
-  writeNotNull('routingNumber', instance.routingNumber);
-  writeNotNull('accountHolderType',
-      _$UsBankAccountHolderTypeEnumMap[instance.accountHolderType]);
-  writeNotNull('accountType', _$UsBankAccountTypeEnumMap[instance.accountType]);
-  writeNotNull('billingDetails', instance.billingDetails?.toJson());
-  writeNotNull('shippingDetails', instance.shippingDetails?.toJson());
-  return val;
-}
+        _$PaymentMethodDataUsBankImpl instance) =>
+    <String, dynamic>{
+      if (instance.accountNumber case final value?) 'accountNumber': value,
+      if (instance.routingNumber case final value?) 'routingNumber': value,
+      if (_$UsBankAccountHolderTypeEnumMap[instance.accountHolderType]
+          case final value?)
+        'accountHolderType': value,
+      if (_$UsBankAccountTypeEnumMap[instance.accountType] case final value?)
+        'accountType': value,
+      if (instance.billingDetails?.toJson() case final value?)
+        'billingDetails': value,
+      if (instance.shippingDetails?.toJson() case final value?)
+        'shippingDetails': value,
+    };
 
 const _$UsBankAccountHolderTypeEnumMap = {
   UsBankAccountHolderType.Company: 'Company',

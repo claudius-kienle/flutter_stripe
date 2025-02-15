@@ -73,6 +73,9 @@ declare namespace stripe {
             data?: ConfirmCardPaymentData,
             options?: ConfirmCardPaymentOptions,
         ): Promise<PaymentIntentResponse>;
+        handleNextAction(
+            options: HandleNextActionOptions,
+        ): Promise<PaymentIntentResponse>;
         handleCardAction(
             clientSecret: string,
         ): Promise<PaymentIntentResponse>;
@@ -641,6 +644,12 @@ declare namespace stripe {
          * Indicates that you intend to make future payments with this PaymentIntent's payment method.
          */
         setup_future_usage?: "on_session" | "off_session";
+    }
+    interface HandleNextActionOptions {
+        /*
+         * The client secret of the PaymentIntent.
+         */
+        clientSecret: string;
     }
     interface ConfirmCardPaymentOptions {
         /*
