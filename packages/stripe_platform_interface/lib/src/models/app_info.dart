@@ -4,7 +4,7 @@ part 'app_info.freezed.dart';
 part 'app_info.g.dart';
 
 @freezed
-class AppInfo with _$AppInfo {
+sealed class AppInfo with _$AppInfo {
   @JsonSerializable(explicitToJson: true)
   const factory AppInfo({
     String? name,

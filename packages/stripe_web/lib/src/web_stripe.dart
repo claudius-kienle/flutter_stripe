@@ -1,4 +1,3 @@
-//@dart=2.12
 import 'dart:async';
 import 'dart:developer' as dev;
 import 'dart:ui' as ui;
@@ -84,15 +83,18 @@ class WebStripe extends StripePlatform {
     PaymentMethodParams data, [
     PaymentMethodOptions? options,
   ]) async {
-    final paymentMethodData = data.maybeWhen(
-      card: (data) => stripe_js.CreatePaymentMethodData(
-          type: 'card',
-          card: element!,
-          billingDetails: data.billingDetails?.toJs()),
-      payPal: (data) => stripe_js.CreatePaymentMethodData(
-          type: 'paypal', billingDetails: data.billingDetails?.toJs()),
-      orElse: () => throw WebUnsupportedError(),
-    );
+    final paymentMethodData = switch (data) {
+      PaymentMethodParamsCard(paymentMethodData: final data) =>
+        stripe_js.CreatePaymentMethodData(
+            type: 'card',
+            card: element!,
+            billingDetails: data.billingDetails?.toJs()),
+      PaymentMethodParamsPayPal(paymentMethodData: final data) =>
+        stripe_js.CreatePaymentMethodData(
+            type: 'paypal', billingDetails: data.billingDetails?.toJs()),
+      _ => throw WebUnsupportedError(),
+    };
+
     try {
       final response = await js.createPaymentMethod(paymentMethodData);
       if (response.error != null) {
@@ -112,31 +114,33 @@ class WebStripe extends StripePlatform {
     PaymentMethodOptions? options,
   ]) async {
     assert(params != null, 'params are not allowed to be null on the web');
-    final response =
-        await params!.maybeWhen<Future<stripe_js.PaymentIntentResponse>>(
-      card: (usage) {
-        return js.confirmCardPayment(
+
+    final response = await switch (params) {
+      // await params!.maybeWhen<Future<stripe_js.PaymentIntentResponse>>(
+      PaymentMethodParamsCard(paymentMethodData: final usage) =>
+        //   card: (usage) {
+        js.confirmCardPayment(
           paymentIntentClientSecret,
           data: stripe_js.ConfirmCardPaymentData(
             paymentMethod: stripe_js.CardPaymentMethodDetails(card: element!),
             setupFutureUsage: options?.setupFutureUsage?.toJs(),
           ),
-        );
-      },
-      cardFromMethodId: (paymentMethodData) {
+        ),
+      PaymentMethodParamsCardWithMethodId(
+        paymentMethodData: final paymentMethodData,
+      ) =>
         // https://stripe.com/docs/js/payment_intents/confirm_card_payment#stripe_confirm_card_payment-existing
-        return js.confirmCardPayment(
+        js.confirmCardPayment(
           paymentIntentClientSecret,
           data: stripe_js.ConfirmCardPaymentData(
             paymentMethod: stripe_js.CardPaymentMethodDetails.id(
               paymentMethodData.paymentMethodId,
             ),
           ),
-        );
-      },
-      cardFromToken: (PaymentMethodDataCardFromToken data) {
+        ),
+      PaymentMethodParamsCardWithToken(paymentMethodData: final data) =>
         // https: //stripe.com/docs/js/payment_intents/confirm_card_payment#stripe_confirm_card_payment-token
-        return js.confirmCardPayment(
+        js.confirmCardPayment(
           paymentIntentClientSecret,
           data: stripe_js.ConfirmCardPaymentData(
             paymentMethod: stripe_js.CardPaymentMethodDetails.token(
@@ -146,49 +150,42 @@ class WebStripe extends StripePlatform {
                     PaymentIntentsFutureUsage.OnSession)
                 .toJs(),
           ),
-        );
-      },
-      alipay: (data) {
+        ),
+      PaymentMethodParamsAlipay(paymentMethodData: final data) =>
         // https://stripe.com/docs/js/payment_intents/confirm_alipay_payment#stripe_confirm_alipay_payment-options
-        return js.confirmAlipayPayment(
+        js.confirmAlipayPayment(
           paymentIntentClientSecret,
           data: stripe_js.ConfirmAlipayPaymentData(
             returnUrl: web.window.location.href,
           ),
-        );
-      },
-      ideal: (paymentData) {
-        if (paymentData.bankName == null) throw 'bankName is required for web';
-        // https://stripe.com/docs/js/payment_intents/confirm_alipay_payment#stripe_confirm_alipay_payment-options
-        return js.confirmIdealPayment(
-          paymentIntentClientSecret,
-          data: stripe_js.ConfirmIdealPaymentData(
-            paymentMethod: stripe_js.IdealPaymentMethodDetails.withBank(
-              ideal: stripe_js.IdealBankData(bank: paymentData.bankName!),
-            ),
-            returnUrl: urlScheme,
-            // recommended
-            // setup_future_usage:
-          ),
-        );
-      },
-      p24: (paymentData) {
-        return js.confirmP24Payment(
-          paymentIntentClientSecret,
-          data: stripe_js.ConfirmP24PaymentData(
-            paymentMethod: stripe_js.P24PaymentMethodDetails(
-              billingDetails: paymentData.billingDetails!.toJs(),
-            ),
-            returnUrl: urlScheme,
-            // recommended
-            // setup_future_usage:
-          ),
-        );
-      },
-      orElse: () {
-        throw WebUnsupportedError();
-      },
-    );
+        ),
+      PaymentMethodParamsIdeal(paymentMethodData: final paymentData) =>
+        (paymentData.bankName == null)
+            ? throw 'bankName is required for web'
+            // https://stripe.com/docs/js/payment_intents/confirm_alipay_payment#stripe_confirm_alipay_payment-options
+            : js.confirmIdealPayment(
+                paymentIntentClientSecret,
+                data: stripe_js.ConfirmIdealPaymentData(
+                  paymentMethod: stripe_js.IdealPaymentMethodDetails.withBank(
+                    ideal: stripe_js.IdealBankData(bank: paymentData.bankName!),
+                  ),
+                  returnUrl: urlScheme,
+                  // recommended
+                  // setup_future_usage:
+                ),
+              ),
+      PaymentMethodParamsP24(paymentMethodData: final paymentData) =>
+        js.confirmP24Payment(paymentIntentClientSecret,
+            data: stripe_js.ConfirmP24PaymentData(
+              paymentMethod: stripe_js.P24PaymentMethodDetails(
+                billingDetails: paymentData.billingDetails!.toJs(),
+              ),
+              returnUrl: urlScheme,
+              // recommended
+              // setup_future_usage:
+            )),
+      _ => throw WebUnsupportedError(),
+    };
     if (response.error != null) {
       throw StripeError(
         message: response.error?.message ?? '',
@@ -250,21 +247,19 @@ class WebStripe extends StripePlatform {
     PaymentMethodParams data,
     PaymentMethodOptions? options,
   ) async {
-    final response = await data
-        .maybeWhen<Future<stripe_js.SetupIntentResponse>>(card: (params) {
-      final data = stripe_js.ConfirmCardSetupData(
-        paymentMethod: stripe_js.CardPaymentMethodDetails(
-          card: element!,
-          billingDetails: params.billingDetails?.toJs(),
+    final response = await switch (data) {
+      PaymentMethodParamsCard(paymentMethodData: final params) =>
+        js.confirmCardSetup(
+          setupIntentClientSecret,
+          data: stripe_js.ConfirmCardSetupData(
+            paymentMethod: stripe_js.CardPaymentMethodDetails(
+              card: element!,
+              billingDetails: params.billingDetails?.toJs(),
+            ),
+          ),
         ),
-      );
-      return js.confirmCardSetup(
-        setupIntentClientSecret,
-        data: data,
-      );
-    }, orElse: () {
-      throw UnimplementedError();
-    });
+      _ => throw UnimplementedError()
+    };
     if (response.error != null) {
       throw response.error!;
     }
@@ -302,10 +297,10 @@ class WebStripe extends StripePlatform {
 
   @override
   Future<TokenData> createToken(CreateTokenParams params) async {
-    final response = await params.maybeWhen<Future<stripe_js.TokenResponse>>(
-      (type, name, address) => throw UnimplementedError(),
-      card: (params) {
-        return _stripe.createCardElementToken(
+    final response = await switch (params) {
+      CreateTokenParamsLegacy() => throw UnimplementedError(),
+      CreateTokenParamsCard(params: final params) =>
+        _stripe.createCardElementToken(
           element! as stripe_js.CardPaymentElement,
           stripe_js.CreateTokenCardData(
             name: params.name,
@@ -316,10 +311,9 @@ class WebStripe extends StripePlatform {
             addressCountry: params.address?.country,
             addressZip: params.address?.postalCode,
           ),
-        );
-      },
-      bankAccount: (params) {
-        return _stripe.createBankAccountToken(
+        ),
+      CreateTokenParamsBankAccount(params: final params) =>
+        _stripe.createBankAccountToken(
           stripe_js.CreateTokenBankAccountData(
             country: params.country,
             currency: params.currency,
@@ -328,19 +322,13 @@ class WebStripe extends StripePlatform {
             routingNumber: params.routingNumber,
             accountNumber: params.accountNumber,
           ),
-        );
-      },
-      pii: (params) {
-        return _stripe.createPIIToken(
+        ),
+      CreateTokenParamsPII(params: final params) => _stripe.createPIIToken(
           stripe_js.CreateTokenPIIData(
             personalIdNumber: params.personalId,
           ),
-        );
-      },
-      orElse: () {
-        throw UnimplementedError();
-      },
-    );
+        ),
+    };
     if (response.error != null) {
       throw response.error!;
     }

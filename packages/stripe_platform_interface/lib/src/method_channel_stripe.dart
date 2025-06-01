@@ -291,12 +291,16 @@ class MethodChannelStripe extends StripePlatform {
 
   @override
   Future<TokenData> createToken(CreateTokenParams params) async {
-    final invokeParams = params.map(
-      (value) => value.toJson(),
-      card: (data) => data.toJson()['params'],
-      pii: (data) => data.toJson()['params'],
-      bankAccount: (data) => data.toJson()['params'],
-    );
+    final invokeParams = switch (params) {
+      CreateTokenParamsCard(params: final data) => data.toJson()['params'],
+      CreateTokenParamsPII(params: final data) => data.toJson()['params'],
+      CreateTokenParamsBankAccount(params: final data) =>
+        data.toJson()['params'],
+      CreateTokenParamsLegacy(name: final name, address: final address) => {
+          'name': name,
+          'address': address?.toJson(),
+        }
+    };
 
     final result = await _methodChannel.invokeMapMethod<String, dynamic>(
         'createToken', {'params': invokeParams});
