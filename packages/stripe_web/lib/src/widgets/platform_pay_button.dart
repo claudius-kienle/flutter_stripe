@@ -1,4 +1,5 @@
 import 'dart:js_interop';
+import 'dart:ui_web' as ui_web;
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
@@ -71,7 +72,7 @@ class _WebPlatformPayButtonState extends State<WebPlatformPayButton> {
   @override
   void initState() {
     // ignore: undefined_prefixed_name
-    ui.platformViewRegistry.registerViewFactory(
+    ui_web.platformViewRegistry.registerViewFactory(
         'stripe_platform_pay_button', (int viewId) => _divElement);
 
     mutationObserver.observe(
